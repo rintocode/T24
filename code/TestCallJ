@@ -1,0 +1,14 @@
+PROGRAM TestCallJ
+
+    class_name = "rintocode.test.Greeting"
+    method_name = "hello"
+    param = "Rinto Harahp"
+
+    CALLJ class_name, method_name, param SETTING ret ON ERROR
+        err = SYSTEM(0)
+        CRT "Error code ": err
+        RETURN
+    END
+
+    CRT "Received from java: ": ret
+END

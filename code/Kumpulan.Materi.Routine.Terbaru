@@ -1,0 +1,749 @@
+Kumpulan materi Routine
+
+PROGRAM RINTO.TEST.1
+
+*--------------------------------------------------------------------------------------
+* NAMA			: RINTO HARAHAP
+* TANGGAL 		: 01 APRIL 2023
+* DESKRIPSI 	: TUGAS PER ORANGAN
+*--------------------------------------------------------------------------------------
+    PROGRAM BSI.GET.ADDRESS
+
+	$INSERT I_COMMON
+	$INSERT I_EQUATE
+	$INSERT I_F.ACCOUNT
+	$INSERT I_F.CUSTOMER
+	$INSERT I_F.COMPANY
+	$INSERT I_F.IDIH.INV.SCHEDULE
+*------------------------------------------------------------------------------------
+	DEBUG
+	FN.ACCOUNT = "F.ACCOUNT"
+	F.ACCOUNT  = ""
+	CALL OPF(FN.ACCOUNT, F.ACCOUNT)
+
+	FN.ACCOUNT.HIS	= "F.ACCOUNT$HIS"
+	F.ACCOUNT.HIS	= ""
+	CALL OPF(FN.ACCOUNT.HIS, F.ACCOUNT.HIS)
+
+	FN.CUSTOMER = "F.CUSTOMER"
+	F.CUSTOMER  = ""
+	CALL OPF(FN.CUSTOMER, F.CUSTOMER)
+	
+	FN.COMPANY = "F.COMPANY"
+	F.COMPANY  = ""
+	CALL OPF(FN.COMPANY, F.COMPANY)
+	
+	FN.IDIH.INV.SCHEDULE = "F.IDIH.INV.SCHEDULE"
+	F.IDIH.INV.SCHEDULE  = ""
+	CALL OPF(FN.IDIH.INV.SCHEDULE, F.IDIH.INV.SCHEDULE)
+
+	CALL GET.LOC.REF('IDIH.INV.SCHHEDULE','DUE.DATE',DUE.DATE.POS)	
+
+	V.WRITE = ""
+
+	SEL.CMD	= "SELECT " : FN.IDIH.INV.SCHEDULE :  " WITH @ID EQ '7024162038'"
+	CALL EB.READLIST(SEL.CMD,SEL.LIST,"",SEL.CNT,SEL.ERR)
+
+    CALL F.READ(FN.IDIH.INV.SCHEDULE, SEL.LIST, R.IDIH.INV.SCHEDULE, F.IDIH.INV.SCHEDULE, IDIH.INV.SCHEDULE.ERR)
+
+    CALL F.READ(FN.ACCOUNT, SEL.LIST, R.ACCOUNT, F.ACCOUNT, ACCOUNT.ERR)
+    V.CUSTOMER = R.ACCOUNT<AC.CUSTOMER> 
+
+	IF V.CUSTOMER EQ '' THEN
+		V.ID = SEL.LIST : ";1"
+		CALL F.READ(FN.ACOUNT.HIS, V.ID, R.ACCOUNT.HIS, F.ACCOUNT.HIS, ACCOUNT.HIS.ERR)
+		V.CUSTOMER = R.ACCOUNT.HIS<AC.CUSTOMER>
+	END
+
+    CALL F.READ(FN.CUSTOMER, V.CUSTOMER, R.CUSTOMER, F.CUSTOMER, CUSTOMER.ERR)
+    V.HASIL.NAMA = R.CUSTOMER<EB.CUS.SHORT.NAME>
+
+	V.COMPANY.CODE = R.IDIH.INV.SCHEDULE<INV.CO.CODE>
+	
+	CALL F.READ(FN.COMPANY, V.COMPANY.CODE, R.COM, F.COMPANY, COMPANY.ERR)
+	V.NAMA.COMPANY = R.COM<EB.COM.COMPANY.NAME>
+
+
+
+    V.NAMA = V.HASIL.NAMA
+    V.NO.REKENING = SEL.LIST
+    V.CABANG = V.NAMA.COMPANY
+    V.SETORAN = R.IDIH.INV.SCHEDULE<INV.CURRENT.AMOUNT.BAL>
+	
+    V.WRITE<-1> = "Nama 					: " : V.NAMA 
+    V.WRITE<-1> = "NO Rekening					: " : V.NO.REKENING
+    V.WRITE<-1> = "Cabang Kantor  				: " : V.CABANG
+    V.WRITE<-1> = "Setoran tiap bulan 			: " : V.SETORAN
+    V.WRITE<-1> = "" 
+    V.WRITE<-1> = "Belum setor tanggal 			: " 
+
+	V.RESULT.DUE = R.IDIH.INV.SCHEDULE<INV.LOCAL.REF,DUE.DATE.POS>
+
+	V.COUNT = DCOUNT(V.RESULT.DUE, @SM)
+
+	FOR IDX = 1 TO V.COUNT
+	V.DUE.DATE = OCONV(ICONV(V.RESULT.DUE<1, 1, IDX>, "D"), "D4")
+	V.WRITE<-1> = V.DUE.DATE
+
+	NEXT IDX
+	
+	FN.FOLDER	= "EVO.BP"
+	F.FOLDER	= ""
+	CALL OPF(FN.FOLDER, F.FOLDER)
+
+	ID.TXT	= "RINTO -TEST.1.txt"
+	WRITE V.WRITE TO F.FOLDER, ID.TXT
+	
+
+    RETURN
+* -----------------------------------------------------------------------------------------
+END
+* -----------------------------------------------------------------------------------------
+
+PROGRAM RINTO.TEST.2
+*---------------------------------------------------------
+* NAMA			: RINTO HARAHAP
+* TANGGAL 		: 16 NOVEMBER 2023
+* DESKRIPSI 	: TUGAS KEDUA
+*---------------------------------------------------------
+
+    PROGRAM BSI.GET.ADDRESS
+
+	$INSERT I_COMMON
+	$INSERT I_EQUATE
+	$INSERT I_F.ACCOUNT
+	$INSERT I_F.CUSTOMER
+*-----------------------------------------------------------
+    FN.ACCOUNT = "F.ACCOUNT"
+	F.ACCOUNT  = ""
+	CALL OPF(FN.ACCOUNT, F.ACCOUNT)
+
+    FN.ACCOUNT.HIS	= "F.ACCOUNT$HIS"
+	F.ACCOUNT.HIS	= ""
+	CALL OPF(FN.ACCOUNT.HIS, F.ACCOUNT.HIS)
+
+    FN.CUSTOMER = "F.CUSTOMER"
+	F.CUSTOMER  = ""
+	CALL OPF(FN.CUSTOMER, F.CUSTOMER)
+
+    FN.FOLDER.IN = "EVO.BP/IN"
+    F.FOLDER.IN = ""
+    CALL OPF(FN.FOLDER.IN, F.FOLDER.IN)
+
+
+    V.WRITE = " "
+    LIST.ACCOUNT.TXT = "listAccount.txt"
+
+    CALL F.READ(FN.FOLDER.IN, LIST.ACCOUNT.TXT, R.FOLDER.IN, F.FOLDER.IN, FOLDER.IN.ERR)
+    V.ID.ACCOUNT = R.FOLDER.IN
+    
+
+    CALL F.READ(FN.ACCOUNT, V.ID.ACCOUNT, R.ACCOUNT, F.ACCOUNT, ACCOUNT.ERR)
+    V.CUSTOMER = R.ACCOUNT<AC.CUSTOMER>
+
+    IF V.CUSTOMER EQ "" THEN
+    V.ID = V.ID.ACCOUNT : ";1"
+    CALL F.READ(FN.ACCOUNT.HIS, V.ID, R.ACCOUNT.HIS, F.ACCOUNT.HIS, ACCOUNT.HIS.ERR)
+    V.CUSTOMER = R.ACCOUNT.HIS<AC.CUSTOMER>
+    END
+
+    CALL F.READ(FN.CUSTOMER, V.CUSTOMER, R.CUSTOMER, F.CUSTOMER, CUSTOMER.ERR)
+    V.NAMA = R.CUSTOMER<EB.CUS.SHORT.NAME>
+
+    V.WRITE<-1> = "NAMA :  " : V.NAMA
+
+    FN.FOLDER.OUT	= "EVO.BP/OUT"
+	F.FOLDER.OUT	= ""
+	CALL OPF(FN.FOLDER.OUT, F.FOLDER.OUT)
+
+	ID.TXT	= "RINTO -TEST.2.txt"
+	WRITE V.WRITE TO F.FOLDER.OUT, ID.TXT
+	
+
+    RETURN
+* ----------------------------------------------------
+END
+*-----------------------------------------------------
+    PROGRAM RINTO.TEST.3
+
+    *---------------------------------------------------------
+    * NAMA			: RINTO HARAHAP
+    * TANGGAL 		: 16 NOVEM BER 2023
+    * DESKRIPSI 	: TUGAS KETIGA
+    *---------------------------------------------------------
+
+        PROGRAM BSI.GET.ADDRESS
+
+        $INSERT I_COMMON
+        $INSERT I_EQUATE
+        $INSERT I_F.ACCOUNT
+        $INSERT I_F.CUSTOMER
+    *-----------------------------------------------------------
+
+    DEBUG
+        FN.ACCOUNT = "F.ACCOUNT"
+        F.ACCOUNT  = ""
+        CALL OPF(FN.ACCOUNT, F.ACCOUNT)
+
+        FN.ACCOUNT.HIS	= "F.ACCOUNT$HIS"
+        F.ACCOUNT.HIS	= ""
+        CALL OPF(FN.ACCOUNT.HIS, F.ACCOUNT.HIS)
+
+        FN.CUSTOMER = "F.CUSTOMER"
+        F.CUSTOMER  = ""
+        CALL OPF(FN.CUSTOMER, F.CUSTOMER)
+
+        FN.FOLDER.IN = "EVO.BP/IN"
+        F.FOLDER.IN = ""
+        CALL OPF(FN.FOLDER.IN, F.FOLDER.IN)
+
+
+        V.WRITE = ""
+        LIST.ACCOUNT.TXT = "listAccountMulti.txt"
+
+        CALL F.READ(FN.FOLDER.IN, LIST.ACCOUNT.TXT, R.FOLDER.IN, F.FOLDER.IN, FOLDER.IN.ERR)
+        V.ID.ACCOUNT = R.FOLDER.IN
+        
+        V.COUNT = DCOUNT(V.ID.ACCOUNT, @FM)
+
+        FOR IDX = 1 TO V.COUNT
+            V.ID = V.ID.ACCOUNT<IDX>
+            CALL F.READ(FN.ACCOUNT, V.ID, R.ACCOUNT, F.ACCOUNT, ACCOUNT.ERR)
+            V.CUSTOMER = R.ACCOUNT<AC.CUSTOMER>
+
+            IF V.CUSTOMER EQ "" THEN
+                V.ID = V.ID.ACCOUNT : ";1"
+                CALL F.READ(FN.ACCOUNT.HIS, V.ID, R.ACCOUNT.HIS, F.ACCOUNT.HIS, ACCOUNT.HIS.ERR)
+                V.CUSTOMER = R.ACCOUNT.HIS<AC.CUSTOMER>
+            END
+
+            CALL F.READ(FN.CUSTOMER, V.CUSTOMER, R.CUSTOMER, F.CUSTOMER, CUSTOMER.ERR)
+            V.NAMA = R.CUSTOMER<EB.CUS.SHORT.NAME>
+
+            V.WRITE<-1> = "NAMA : " : V.NAMA
+        NEXT IDX
+
+        FN.FOLDER.OUT	= "EVO.BP/OUT"
+        F.FOLDER.OUT	= ""
+        CALL OPF(FN.FOLDER.OUT, F.FOLDER.OUT)
+
+        ID.TXT	= "RINTO -TEST.3.txt"
+        WRITE V.WRITE TO F.FOLDER.OUT, ID.TXT
+        
+
+        RETURN
+
+    * ----------------------------------------------------
+    END
+
+*----------------------------------------------------------------
+
+PROGRAM RINTO.CASE.1
+
+*----------------------------------------------------------------
+
+ $INSERT I_COMMON
+ $INSERT I_EQUATE
+ $INSERT I_F.ACCOUNT
+ $INSERT I_F.CUSTOMER
+*-----------------------------------------------------------------
+    DEBUG
+    FN.FOLDER.IN = "EVO.BP/IN"
+    F.FOLDER.IN = ""
+    CALL OPF(FN.FOLDER.IN, F.FOLDER.IN)
+
+*-------------------------------------------------------------------
+
+    V.WRITE = ""
+
+    LIST.ACCOUNT.TXT = "studyCaseTEST.txt"   
+
+    CALL F.READ(FN.FOLDER.IN, LIST.ACCOUNT.TXT, R.FOLDER.IN, F.FOLDER.IN, FOLDER.IN.ERR)
+    V.RESULT.CASE = R.FOLDER.IN
+
+    V.COUNT = DCOUNT(V.RESULT.CASE, @FM)
+
+    FOR IDX = 1 TO V.COUNT
+        V.DATA = V.RESULT.CASE<IDX,1,1>
+
+        V.MSG.ID = TRIM(FIELD(V.DATA,'|',1),"","")
+        V.REK.CREDIT = TRIM(FIELD(V.DATA,'|',2),"","")
+        V.REK.DEBIT = TRIM(FIELD(V.DATA,'|',3),"","")
+        V.SALDO = TRIM(FIELD(V.DATA,'|',4),"","")
+        V.KETERANGAN = TRIM(FIELD(V.DATA,'|',5),"","")
+
+        V.CO.CODE = 'ID0010001'
+        V.CURR = 'IDR'
+        OFS.MSG = 'FUNDS.TRANSFER,/I/PROCESS,//':V.CO.CODE:',,TRANSACTION.TYPE::=AC,DEBIT.ACCT.NO::=':V.REK.DEBIT:',DEBIT.AMOUNT::=':V.SALDO:','
+        OFS.MSG := 'DEBIT.CURRENCY::=':V.CURR:',CREDIT.ACCT.NO::=':V.REK.CREDIT:',CREDIT.CURRENCY::=':V.CURR:',MSG.ID::=':V.MSG.ID:',PAYMENT.DETAILS:1:="':V.KETERANGAN: '"'
+
+        OFS.SOURCE ="INWARD.TRANS"
+
+        CALL OFS.GLOBUS.MANAGER(OFS.SOURCE, OFS.MSG)
+        Y.RES.OFS.MSG = OFS.MSG
+
+        V.ID.FT = FIELD(OFS.MSG, "/", 1)
+
+        RES.MSG = FIELD(OFS.MSG, "/", 3)
+        RES.MSG = FIELD(RES.MSG, ",", 1)
+
+        V.STATUS = ""
+        V.LOG = "" 
+
+         IF RES.MSG EQ 1 THEN
+            V.STATUS = "Sukses"
+        END ELSE
+            V.STATUS = "Gagal"
+            V.LOG = FIELD(Y.RES.OFS.MSG, ",", 2)
+        END
+
+
+        V.WRITE<-1>	= V.MSG.ID : " " : V.ID.FT : " " : V.STATUS : " " : V.LOG
+    NEXT IDX
+
+    FN.FOLDER.OUT   = "EVO.BP/OUT"
+    F.FOLDER.OUT    = ""
+    CALL OPF(FN.FOLDER.OUT, F.FOLDER.OUT)
+
+    ID.TXT = "RINTO - CASE.1.txt"
+    WRITE V.WRITE TO F.FOLDER.OUT, ID.TXT
+
+    RETURN
+ *----------------------------------------------------------------------
+    END
+
+*-----------------------------------------------------------------------
+
+PROGRAM RINTO.CASE.2
+
+*----------------------------------------------------------------
+
+ $INSERT I_COMMON
+ $INSERT I_EQUATE
+ $INSERT I_F.ACCOUNT
+ $INSERT I_F.CUSTOMER
+*-----------------------------------------------------------------
+
+    DEBUG
+    FN.FOLDER.IN = "EVO.BP/IN"
+    F.FOLDER.IN = ""
+    CALL OPF(FN.FOLDER.IN, F.FOLDER.IN)
+
+*-------------------------------------------------------------------
+
+    V.WRITE = ""
+
+    LIST.ACCOUNT.TXT = "serviceFT.txt"   
+
+    CALL F.READ(FN.FOLDER.IN, LIST.ACCOUNT.TXT, R.FOLDER.IN, F.FOLDER.IN, FOLDER.IN.ERR)
+    V.RESULT.CASE = R.FOLDER.IN
+
+    V.COUNT = DCOUNT(V.RESULT.CASE, @FM)
+
+    FOR IDX = 1 TO V.COUNT
+        V.DATA = V.RESULT.CASE<IDX,1,1>
+
+        V.TRANSACTION.TYPE = TRIM(FIELD(V.DATA,'|',1),"","")
+        V.REK.DEBIT = TRIM(FIELD(V.DATA,'|',2),"","")
+        V.NOMINAL = TRIM(FIELD(V.DATA,'|',3),"","")
+        V.REK.CREDIT = TRIM(FIELD(V.DATA,'|',4),"","")
+        V.KETERANGAN = "RINTO HARAHAP"
+
+        V.CO.CODE = 'ID0010001'
+        V.CURR = 'IDR'
+        OFS.MSG = 'FUNDS.TRANSFER,/I/PROCESS//0,//':V.CO.CODE:',,TRANSACTION.TYPE::=':V.TRANSACTION.TYPE:',DEBIT.ACCT.NO::=':V.REK.DEBIT:',DEBIT.AMOUNT::=':V.NOMINAL:','
+        OFS.MSG := 'DEBIT.CURRENCY::=':V.CURR:',CREDIT.ACCT.NO::=':V.REK.CREDIT:',CREDIT.CURRENCY::=':V.CURR:',PAYMENT.DETAILS:1:="':V.KETERANGAN: '"'
+
+        OFS.SOURCE ="INWARD.TRANS"
+
+        CALL OFS.GLOBUS.MANAGER(OFS.SOURCE, OFS.MSG)
+    
+        V.ID.FT = FIELD(OFS.MSG,'/',1)
+
+        V.WRITE<-1>	= V.ID.FT
+    NEXT IDX
+
+
+
+
+    FN.FOLDER.OUT   = "EVO.BP/OUT"
+    F.FOLDER.OUT    = ""
+    CALL OPF(FN.FOLDER.OUT, F.FOLDER.OUT)
+
+    ID.TXT = "RINTO - CASE.2.txt"
+    WRITE V.WRITE TO F.FOLDER.OUT, ID.TXT
+
+    RETURN
+ *----------------------------------------------------------------------
+    END
+
+*-----------------------------------------------------------------------
+
+  PROGRAM TEST.FREQ
+
+    $INSERT I_COMMON
+    $INSERT I_EQUATE
+    $INSERT I_F.IDIH.INV.SCHEDULE
+    $INSERT I_F.ACCOUNT
+    
+    
+    FN.INV.FREQ.DATE    = "F.INV.FREQ.DATE"
+    F.INV.FREQ.DATE     = ""
+    CALL OPF(FN.INV.FREQ.DATE, F.INV.FREQ.DATE)
+
+    FN.IDIH.INV.SCHEDULE    = "F.IDIH.INV.SCHEDULE"
+    F.IDIH.INV.SCHEDULE     = ""
+    CALL OPF(FN.IDIH.INV.SCHEDULE, F.IDIH.INV.SCHEDULE)
+
+    FN.FOLDER.IN = 'EVO.BP\IN'
+    F.FOLDER.IN  = ''
+    CALL OPF(FN.FOLDER.IN, F.FOLDER.IN)
+
+    YAPPLICATION.NAME = 'IDIH.INV.SCHEDULE'
+    YFIELD.NAME = 'DUE.DATE'
+    LREF.POS = ''
+    CALL MULTI.GET.LOC.REF (YAPPLICATION.NAME, YFIELD.NAME, LREF.POS)
+    Y.DUE.DATE.POS         = LREF.POS<1, 1>
+
+    DEBUG
+    ID.FOLDER.IN = 'data_idihInvSchedule.txt'
+    CALL F.READ(FN.FOLDER.IN, ID.FOLDER.IN, R.FOLDER.IN, F.FOLDER.IN, ERR.FOLDER.IN)
+    
+    ID.FOLDER.FREQ.IN = 'data_invFreqDate.txt'
+    CALL F.READ(FN.FOLDER.IN, ID.FOLDER.FREQ.IN, R.FOLDER.FREQ.IN, F.FOLDER.IN, ERR.FOLDER.FREQ.IN)
+
+    
+    CNT.ID.TAPENAS = DCOUNT(R.FOLDER.IN, FM)
+    FOR IDX = 1 TO CNT.ID.TAPENAS
+	R.FOLDER.IN = R.FOLDER.IN<IDX>
+        R.DATE = FIELD(R.FOLDER.IN, '*', 2)
+	R.DATE.CNT	= DCOUNT(R.DATE, SM)
+        ID.TAPENAS = FIELD(R.FOLDER.IN, '*', 1)
+	
+        CALL F.READ(FN.IDIH.INV.SCHEDULE, ID.TAPENAS, R.IDIH.INV.SCHEDULE, F.IDIH.INV.SCHEDULE, IDIH.INV.SCHEDULE.ERR)
+	    R.IDIH.INV.SCHEDULE<INV.LOCAL.REF, Y.DUE.DATE.POS> = ""
+ 	FOR IDY = 1 TO R.DATE.CNT
+		R.DATE.SINGLE = R.DATE<1, 1, IDY>
+		R.IDIH.INV.SCHEDULE<INV.LOCAL.REF, Y.DUE.DATE.POS, -1> = R.DATE.SINGLE
+
+       CALL F.WRITE(FN.IDIH.INV.SCHEDULE,ID.TAPENAS,R.IDIH.INV.SCHEDULE)
+        CALL JOURNAL.UPDATE("")
+	NEXT IDY
+
+    NEXT IDX
+
+*-----------------------------------------------------------------------------------------------------
+
+    Format OFS : FUNDS.TRANSFER,LOG.BALANCE/I/VALIDATION/ID KITA/PASWORD/CO.CODE,FT
+                 TABLE/          VERSION/ INPUT/ PROCESSVALIDATION/ ID/ PASWORD/ CODE COMPANY/ ID
+
+    tSS GCS : UNTUK MENJALANKAN OFS
+*-----------------------------------------------------------------------------------------------------
+
+EVO.ENQ.RINTO
+
+*-----------------------------------------------------------------------------------------------------
+    CRT "Masukan Agka :"
+    INPUT V.ANGKA
+
+    FOR IDX = 0 TO V.ANGKA - 1
+        V.HASIL = 2 ** IDX 
+        CRT V.HASIL
+    NEXT IDX
+
+    
+            
+
+    RETURN
+*------------------------------------------------------------------------------------
+END
+*------------------------------------------------------------------------------------
+
+PROGRAM TAB.HAJI.TEST
+
+*   CRT "Masukan Agka :"
+*    INPUT V.ANGKA
+
+    V.TOTAL = 10
+    V.ANGKA = "6"
+    V.WRITE = ""
+
+    FOR IDX = 1 TO V.TOTAL
+*        V.HASIL = 2 ** IDX 
+        IF IDX EQ 6 OR IDX EQ 8 THEN
+            CRT IDX : "Ini Bukan Lagi Angka"
+        END ELSE
+            CRT "HASIL = " : " " : IDX : "X"
+        END
+    NEXT IDX
+
+    
+            
+
+    RETURN
+*------------------------------------------------------------------------------------
+END
+*------------------------------------------------------------------------------------
+
+PROGRAM TAB.HAJI.TEST
+
+    CRT "Masukan Character Maks 10 :"
+    INPUT V.CHAR
+
+    V.RES.LENGTH = LEN(V.CHAR) 
+
+    IF V.RES.LENGTH GT 10 THEN
+        CRT "KARAKTER TIDAK BOLEH LEBIH DARI 10"
+    END ELSE IF MOD(V.RES.LENGTH, 2) EQ 0 THEN
+        CRT "KARAKTER TIDAK BOLEH GENAP, HARUS GANJIL"
+    END ELSE
+        V.HASIL = V.RES.LENGTH / 2
+        CRT V.CHAR[V.HASIL, 1]
+    END 
+
+    
+            
+
+    RETURN
+*------------------------------------------------------------------------------------
+END
+*------------------------------------------------------------------------------------
+
+PROGRAM TAB.HAJI.TEST
+
+    CRT "Masukan Angka :"
+    INPUT V.NUM
+    
+    IF V.NUM LT 1 THEN
+        CRT "Angka Harus Lebih Besar Dari 0"
+    END ELSE IF V.NUM EQ 1 THEN
+        CRT V.NUM
+    END ELSE
+        FOR IDX = 2 TO V.NUM
+            IF MOD(V.NUM, IDX) EQ 0 THEN
+                CRT V.NUM : " Bukan Bilangan Prima"
+                BREAK
+            END ELSE
+                CRT "Merupakan Bilangan Prima" 
+                BREAK
+            END
+        NEXT IDX
+    END
+
+             
+
+    RETURN
+*------------------------------------------------------------------------------------
+END
+*------------------------------------------------------------------------------------
+    
+    PROGRAM IDG.TEST.3
+
+    $INSERT I_COMMON
+	$INSERT I_EQUATE
+	$INSERT I_F.ACCOUNT
+	$INSERT I_F.CUSTOMER
+    
+    DEBUG
+    FN.ACCOUNT = "F.ACCOUNT"
+	F.ACCOUNT  = ""
+	CALL OPF(FN.ACCOUNT, F.ACCOUNT)
+
+    FN.CUSTOMER = "F.CUSTOMER"
+	F.CUSTOMER  = ""
+	CALL OPF(FN.CUSTOMER, F.CUSTOMER)
+
+    FN.CUSTOMER.ACCOUNT = "F.CUSTOMER.ACCOUNT"
+	F.CUSTOMER.ACCOUNT  = ""
+	CALL OPF(FN.CUSTOMER.ACCOUNT, F.CUSTOMER.ACCOUNT)
+
+    
+    V.WRITE = ""
+
+    CRT "MASUKAN CIF:"
+    INPUT V.ID
+
+    CALL F.READ(FN.CUSTOMER, V.ID, R.CUSTOMER, F.CUSTOMER, CUSTOMER.ERR)
+
+    IF V.ID EQ "" THEN
+        V.WRITE = "CIF TIDAK DI TEMUKAN"
+    ELSE 
+        V.NAME.CUS = R.CUSTOMER<EB.CUS.SHORT.NAME>
+        PRINT"NAMA :" : V.NAME.CUS
+        CALL F.READ(FN.CUSTOMER.ACCOUNT, V.ID, R.CUSTOMER.ACCOUNT, F.CUSTOMER.ACCOUNT, CUSTOMER.ACCOUNT.ERR)
+        V.ID.CST = DCOUNT(R.CUSTOMER.ACCOUNT, FM)
+        FOR IDX = 1 TO V.ID.CST
+            V.ID.RES = R.CUSTOMER.ACCOUNT<IDX>
+        CALL F.READ(FN.ACCOUNT, V.ID.RES, R.ACCOUNT, F.ACCOUNT, ACCOUNT.ERR)
+        V.RESULT = R.ACCOUNT<AC.ACOUNT.TITLE>           
+        NEXT IDX
+    END
+
+    PRINT"Data Rekening :" : V.ID.RES " | " : V.RESULT
+    
+
+    RETURN
+*---------------------------------------------------------------------
+END
+*---------------------------------------------------------------------
+masukan bilangan
+1
+
+1
+
+masukan bilangan
+4
+
+angka 4 bukan bilangan prima
+
+masukan bilangan 
+11
+
+angka 11 adalah bilangan prima
+
+CRT "Masukan Angka :"
+INPUT V.ID
+
+
+IF ANGKA LT 1 THEN
+    PRINT "Angka harus lebih besar dari 0"
+END ELSE IF ANGKA EQ 1 THEN
+    V.ID
+END ELSE
+    FOR IDX = 2 TO V.ID
+        IF MOD(V.ID, IDX) EQ 0 THEN
+            PRINT "Angka bukan bilangan prima"
+        END ELSE
+            PRINT "Angka merupakan bilangan prima"
+        END
+    NEXT IDX
+END
+*-----------------------------------------------------------------------
+    
+    PROGRAM SWT.TEST.2
+
+
+
+    V.WRITE = ""
+
+    CRT "Masukkan maks 21 karakter :"
+    INPUT V.KARAKTER
+ 
+    Y.KARAKTER.LENGTH = LEN(V.KARAKTER)
+ 
+    IF MOD(Y.KARAKTER.LENGTH, 2) EQ 0 THEN
+        CRT "Maaf, jumlah karakter yang diinput " : Y.KARAKTER.LENGTH : " , harus Ganjil ya.."
+    END ELSE IF Y.KARAKTER.LENGTH GT 21 THEN
+        CRT "Maaf, jumlah karakter yang diinput " : Y.KARAKTER.LENGTH : " , maksimal 21 ya.."
+    END ELSE
+        Y.BAGI = (Y.KARAKTER.LENGTH / 2)
+        Y.HURUF.TENGAH = V.KARAKTER[Y.BAGI, 1]
+ 
+        CRT "Karakter tengah: " : Y.HURUF.TENGAH
+    END
+
+
+    RETURN
+*---------------------------------------------------------------------
+END
+*---------------------------------------------------------------------
+1.
+SELECT FBNK.LIMIT.COL.ALLOC.WORK WITH LIMIT.ID LIKE '...73171696...'
+LIST FBNK.LIMIT.COL.ALLOC.WORK ONLY
+ 
+LIST FBNK.LIMIT.COL.ALLOC.WORK '11331'
+LIST FBNK.LIMIT.COL.ALLOC.WORK '54053'
+ 
+ 
+2.
+SELECT FBNK.LI.COLLATERAL.RIGHT '...73970173...'
+LIST FBNK.LI.COLLATERAL.RIGHT ONLY
+ 
+LIST FBNK.LI.COLLATERAL.RIGHT 'YYY'
+ 
+ 
+3.
+LIMIT '...74333947...' (browser)
+ 
+4.
+COLLATERAL.RIGHT '...74333947...' (browser)
+ 
+5.
+COLLATERAL.RIGHT.CUST '...74333947...' (browser)
+
+82511385
+876593
+1036590
+
+73825066
+103680
+85094
+
+81905882
+1107229
+845265
+
+73970173
+113054
+55503
+
+73171696
+11331
+54053   
+*-----------------------------------------------------------------------------------------------------
+
+PROGRAM RINTO.COBA.COBA
+
+* -------------------------------------------------------------------------------
+* Nama			: RINTO HARAHAP
+* Tanggal       : 28 NOVEMBER 2023
+* Deskripsi     : CHECK VALIDASI ROUTINE
+* -------------------------------------------------------------------------------
+
+* -------------------------------------------------------------------------------
+    $INSERT I_COMMON
+    $INSERT I_EQUATE
+
+* -------------------------------------------------------------------------------
+   DEBUG
+
+    V.WRITE = ''
+
+   FOR IDX = 1 TO 100
+    IF MOD(IDX, 3) EQ 0 AND MOD(IDX, 5) EQ 0 THEN
+         V.WRITE<-1> = IDX : ' ADALAH KELIPATAN 3 DAN 5' 
+    END ELSE IF MOD(IDX, 5) EQ 0 THEN
+         V.WRITE<-1> = IDX : ' ADALAH KELIPATAN 5'
+    END ELSE IF MOD(IDX, 3) EQ 0 THEN
+         V.WRITE<-1> = IDX : ' ADALAH KELIPATAN 3'
+    END ELSE
+        V.WRITE<-1> = IDX
+    END
+        
+
+   NEXT IDX
+
+
+
+    FN.FOLDER.OUT   = "EVO.BP"
+    F.FOLDER.OUT    = ""
+    CALL OPF(FN.FOLDER.OUT, F.FOLDER.OUT)
+
+    ID.TXT = "LATIHAN.1.txt"
+    WRITE V.WRITE TO F.FOLDER.OUT, ID.TXT
+
+    RETURN
+* -------------------------------------------------------------------------------
+END
+
+*-----------------------------------------------------------------------------------------------------
+EB.LOOKUP,
+SEC.TRADE*PARAM
+SEC.TRADE*CATEGORY
+
+OFS : FUNDS.TRANSFER,LOG.BALANCE/I/VALIDATION/ID KITA/PASWORD/CO.CODE,FT
+ BCON,MAIN
+ ENQ IDIE.ACCOUNT.STATEMENT.ONLINE
+ ENQ IDI.CATEG.ENT.BOOK
+ COUNT FBNK.INV.FREQ.DATE WITH @ID LIKE '...1060560982...'
+*-----------------------------------------------------------------------------------------------------
