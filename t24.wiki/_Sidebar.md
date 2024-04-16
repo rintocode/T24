@@ -1,0 +1,33 @@
+- [Home](https://github.com/rintocode/t24/wiki)
+- [Getting started with InfoBasic(jbc)](./Getting-started)
+- Key Features of InfoBasic
+  - [Variables and Data Types](./Variables-and-Data-Types)
+  - [Comments](./Comments)
+  - [Assignment and Comparison Operators](./Operators)
+  - [Arithmetic Operations](./Arithmetics)
+  - [Multi Value](./Multi-value)
+  - [Statements and Functions](./Statements-and-Functions)
+- Control Flow
+  - [If and If...else Statement](./If-Else)
+  - [CASE Statement](./Case)
+  - [Loops: For and While](./Loops)
+  - [GOSUB and Labels](./Labels)
+- Subroutines and Functions
+  - [Subroutine Vs Functions](./Subroutine-Vs-Functions)
+  - [Structure of Subroutine](./Structure-of-Subroutine)
+  - [Subroutines](./Subroutines)
+  - [Functions](./Functions)
+  - [Working with Files](./Files)
+- [OFS](./OFS)
+- [Template Programming](./Template-Programming)
+- [T24 Integration with other Systems](./Integration)
+- T24 Business Training
+  - [Customer and Accounts](./cu-ac)
+  - [Funds Transfer](./funds-transfer)
+  - [AA Module](./aa)
+- T24 Navigation Training
+  - [Classic UI](./navigation-classic)
+  - [Browser UI](./navigation-browser)
+- T24 Administration Training
+  - [Temenos Connectors](./Temenos-Connectors)
+  - [Close of Business(COB)](./cob)
