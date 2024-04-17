@@ -7,7 +7,6 @@ PROGRAM RINTO.TEST.1
 * TANGGAL 		: 01 APRIL 2023
 * DESKRIPSI 	: TUGAS PER ORANGAN
 *--------------------------------------------------------------------------------------
-    PROGRAM BSI.GET.ADDRESS
 
 	$INSERT I_COMMON
 	$INSERT I_EQUATE
@@ -107,7 +106,6 @@ PROGRAM RINTO.TEST.2
 * DESKRIPSI 	: TUGAS KEDUA
 *---------------------------------------------------------
 
-    PROGRAM BSI.GET.ADDRESS
 
 	$INSERT I_COMMON
 	$INSERT I_EQUATE
@@ -171,8 +169,6 @@ END
     * TANGGAL 		: 16 NOVEM BER 2023
     * DESKRIPSI 	: TUGAS KETIGA
     *---------------------------------------------------------
-
-        PROGRAM BSI.GET.ADDRESS
 
         $INSERT I_COMMON
         $INSERT I_EQUATE
