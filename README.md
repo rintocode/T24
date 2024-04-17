@@ -50,9 +50,9 @@ This is a beginner to intermediate course. This means that some of the advanced 
 - T24 Docker 
   - [Temenos Docker](https://github.com/rintocode/t24/wiki/Temenos-Docker)
 - T24 By Anabatic
-  - [T24 Application Development](https://github.com/rintocode/t24/wiki/Temenos-Docker)
-  - [T24 COB_protected](https://github.com/rintocode/t24/wiki/Temenos-Docker)
-  - [T24 Customization - Abbreviation](https://github.com/rintocode/t24/wiki/Temenos-Docker)
-  - [T24 Customization - Composite Screen](https://github.com/rintocode/t24/wiki/Temenos-Docker)
-  - [T24 Customization - Enquiry](https://github.com/rintocode/t24/wiki/Temenos-Docker)
-  - [T24 Customization - Local Reference Field](https://github.com/rintocode/t24/wiki/Temenos-Docker)
+  - [Application Development](https://github.com/rintocode/t24/wiki/Application-Development)
+  - [COB_protected](https://github.com/rintocode/t24/wiki/COB-protected)
+  - [Customization-Abbreviation](https://github.com/rintocode/t24/wiki/Customization-Abbreviation)
+  - [Customization-Composite-Screen](https://github.com/rintocode/t24/wiki/Customization-Composite-Screen)
+  - [Customization-Enquiry](https://github.com/rintocode/t24/wiki/Customization-Enquiry)
+  - [Customization-Local-Reference-Field](https://github.com/rintocode/t24/wiki/Customization-Local-Reference-Field)
